@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 
 import { loginAction } from "@/actions/auth-action";
 import { useState, useTransition } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export const FormLogin = () => {
   const router = useRouter();
