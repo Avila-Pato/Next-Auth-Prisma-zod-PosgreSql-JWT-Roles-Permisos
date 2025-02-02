@@ -1,5 +1,5 @@
 "use client";
-import { LoginInSchema } from "@/lib/zod";
+import { LoginSchema } from "@/lib/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -14,20 +14,21 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
+import { loginAction } from "@/actions/auth-action";
+
 export const FormLogin = () => {
-  const form = useForm<z.infer<typeof LoginInSchema>>({
-    resolver: zodResolver(LoginInSchema),
+  const form = useForm<z.infer<typeof LoginSchema>>({
+    resolver: zodResolver(LoginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof LoginInSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof LoginSchema>) {
+    await loginAction(values);
   }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
