@@ -15,8 +15,14 @@ import {
 import { Input } from "@/components/ui/input";
 
 import { loginAction } from "@/actions/auth-action";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/router";
 
 export const FormLogin = () => {
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
@@ -26,7 +32,17 @@ export const FormLogin = () => {
   });
 
   async function onSubmit(values: z.infer<typeof LoginSchema>) {
-    await loginAction(values);
+    setError(null); // limpia el error
+    // start Trasnsition me ayuda a que no se refresque la pagina cuando se envia el formulario
+    startTransition(async () => {
+      const response = await loginAction(values);
+      if (response.error) {
+        setError(response.error);
+      } else {
+        // si funciona redirecciona a la pagina principal
+        router.push("/dashboard");
+      }
+    });
   }
 
   return (
@@ -45,7 +61,7 @@ export const FormLogin = () => {
             </FormItem>
           )}
         />
-
+        {error && <FormMessage>{error}</FormMessage>}
         <FormField
           control={form.control}
           name="password"
@@ -59,7 +75,9 @@ export const FormLogin = () => {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button type="submit" disabled={isPending}>
+          Submit
+        </Button>
       </form>
     </Form>
   );
